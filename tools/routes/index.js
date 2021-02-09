@@ -122,7 +122,6 @@ app.post("/location/:locationId/rooms/:roomId", (req, res) => {
 });
 
 app.post("/register", async (req, res, next) => {
-  // req.body.password = await bcrypt.hash(req.body.password, 10);
   const user = await User.create(req.body);
 
   user.password = await bcrypt.hash(req.body.password, 10);
