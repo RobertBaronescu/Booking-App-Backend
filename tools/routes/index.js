@@ -5,34 +5,27 @@ const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const Test = require("../models/test");
 const User = require("../models/user");
 
 const jwt = require("jsonwebtoken");
-const checkAuth = require("../middleware/check-auth");
 const bcrypt = require("bcrypt");
-const bcryptjs = require("bcryptjs");
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const { getTests, getTest, deleteTest } = require("../controllers/test");
 const { getLocations, getLocation } = require("../controllers/locations");
 const {
   getRooms,
   getRoom,
   postRoom,
   deleteRoom,
-  getReviews,
   postReview,
 } = require("../controllers/room");
 
 const {
   getUsers,
   getUser,
-  postUser,
-
   changeUserName,
   changeUserPassword,
   changeUserPicture,
@@ -49,29 +42,6 @@ mongoose
   .catch(() => {
     console.log("not connected");
   });
-
-app.post("/test", async (req, res, next) => {
-  try {
-    const test = await Test.create(req.body);
-    return res.status(201).json({
-      success: true,
-      data: test,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: "",
-    });
-  }
-});
-
-app.get("/test", (req, res) => {
-  return getTests(req, res);
-});
-
-app.get("/test/:id", (req, res) => {
-  return getTest(req, res);
-});
 
 app.get("/locations", (req, res) => {
   return getLocations(req, res);
@@ -168,10 +138,6 @@ app.post("/login", async (req, res, next) => {
       message: "Wrong credentials",
     });
   }
-});
-
-app.delete("/test/:id", (req, res) => {
-  return deleteTest(req, res);
 });
 
 app.listen(3000, () => console.log("listening"));
