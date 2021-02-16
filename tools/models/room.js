@@ -3,19 +3,20 @@ const mongoose = require("mongoose");
 const roomSchema = mongoose.Schema({
   name: { type: String, required: true },
   address: { type: String, required: true },
-  type: { type: String, required: true },
-  smallDescription: { type: String, required: true },
-  theSpace: { type: String, required: true },
+  intro: { type: String, required: true },
+  description: { type: String, required: true },
+  thumbnail: { type: String, required: true },
   interactionWithGuests: { type: String, required: true },
-  ameneties: { type: String, required: false },
-  price: { type: String, required: true },
+  amenities: [{ type: String, required: false }],
+  price: { type: Number, required: true },
   bookingIds: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
+      required: false,
     },
   ],
-  pictures: [{ type: String, required: false }],
+  // pictures: [{ type: String, required: false }],
 
   reviews: [
     {
@@ -28,9 +29,12 @@ const roomSchema = mongoose.Schema({
       },
       rating: { type: Number, required: true },
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    
+      required: false,
     },
   ],
+  rating: { type: Number, required: true },
+  hostId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  photos: [{ type: String, required: false }],
 });
 
 module.exports = mongoose.model("Room", roomSchema);

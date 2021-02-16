@@ -11,16 +11,22 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: "50mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-const { getLocations, getLocation } = require("../controllers/locations");
+const {
+  getLocations,
+  getLocation,
+  getLocationByRoomId,
+} = require("../controllers/locations");
 const {
   getRooms,
   getRoom,
   postRoom,
   deleteRoom,
   postReview,
+  getRoomsByHost,
+  editRoom,
 } = require("../controllers/room");
 
 const {
@@ -30,6 +36,13 @@ const {
   changeUserPassword,
   changeUserPicture,
 } = require("../controllers/users");
+
+const {
+  postBooking,
+  getBookings,
+  deleteBooking,
+  getBookingsByHost,
+} = require("../controllers/bookings");
 
 mongoose
   .connect(
@@ -71,16 +84,28 @@ app.post("/user/login-security", (req, res) => {
   return changeUserPassword(req, res);
 });
 
+app.get("/rooms/:roomId", (req, res) => {
+  return getRoom(req, res);
+});
+
+app.put("/room/edit/:roomId", (req, res) => {
+  return editRoom(req, res);
+});
+
+app.get("/rooms/location/:roomId", (req, res) => {
+  return getLocationByRoomId(req, res);
+});
+
 app.get("/location/:locationId/rooms", (req, res) => {
   return getRooms(req, res);
 });
 
-app.post("/location/:locationId/rooms", (req, res) => {
-  return postRoom(req, res);
+app.get("/rooms/host/:hostId", (req, res) => {
+  return getRoomsByHost(req, res);
 });
 
-app.get("/location/:locationId/rooms/:roomId", (req, res) => {
-  return getRoom(req, res);
+app.post("/add-room", (req, res) => {
+  return postRoom(req, res);
 });
 
 app.delete("/location/:locationId/rooms/:roomId", (req, res) => {
@@ -138,6 +163,22 @@ app.post("/login", async (req, res, next) => {
       message: "Wrong credentials",
     });
   }
+});
+
+app.post("/booking/success", async (req, res) => {
+  return postBooking(req, res);
+});
+
+app.get("/bookings/:userId", async (req, res) => {
+  return getBookings(req, res);
+});
+
+app.get("/bookings/rooms/host/:hostId", (req, res) => {
+  return getBookingsByHost(req, res);
+});
+
+app.delete("/user/user-bookings/:bookingId", async (req, res) => {
+  return deleteBooking(req, res);
 });
 
 app.listen(3000, () => console.log("listening"));
