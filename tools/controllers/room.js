@@ -2,11 +2,34 @@ const Room = require("../models/room");
 const User = require("../models/user");
 const Booking = require("../models/booking");
 const Location = require("../models/location");
-const shortUrl = require("node-url-shortener");
 
 exports.getRooms = async (req, res, next) => {
   try {
     const rooms = await Room.find();
+
+    return res.status(200).json(rooms);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: "",
+    });
+  }
+};
+
+exports.getBestRatedRooms = async (req, res) => {
+  try {
+    const rooms = await Room.find({ $query: {}, $orderby: { rating: -1 } });
+    rooms.splice(4);
+    for (let i = 0; i < rooms.length; i++) {
+      const foundUser = await User.findById(rooms[i]._doc.hostId);
+
+      rooms[i]._doc = {
+        ...rooms[i]._doc,
+        author: foundUser._doc.name,
+        hostPicture: foundUser._doc.picture,
+      };
+    }
+
     return res.status(200).json(rooms);
   } catch (error) {
     return res.status(500).json({
@@ -77,6 +100,7 @@ exports.getRoom = async (req, res, next) => {
       reservations,
       hostName: host.name,
       hostPicture: host.picture,
+      hostId: host._id,
     });
   } catch (err) {
     return res.status(500).json({
@@ -147,6 +171,40 @@ exports.deleteRoom = async (req, res, next) => {
   try {
     const filterQuery = { _id: req.params.roomId };
     const room = await Room.findOneAndRemove(filterQuery);
+    await Booking.find(
+      {
+        roomId: req.params.roomId,
+      },
+      async function (err, data) {
+        for (let i = 0; i < data.length; i++) {
+          await User.findOneAndUpdate(
+            { bookingIds: data[i]._id },
+            {
+              $pull: { bookingIds: data[i]._id },
+            }
+          );
+
+          await Booking.findOneAndDelete({ _id: data[i]._id });
+        }
+      }
+    );
+    await Location.findOneAndUpdate(
+      { roomIds: req.params.roomId },
+      {
+        $pull: {
+          roomIds: req.params.roomId,
+        },
+      }
+    );
+
+    await User.findOneAndUpdate(
+      { roomIds: req.params.roomId },
+      {
+        $pull: {
+          roomIds: req.params.roomId,
+        },
+      }
+    );
 
     if (!room) {
       return res.status(500).json({

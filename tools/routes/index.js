@@ -27,6 +27,8 @@ const {
   postReview,
   getRoomsByHost,
   editRoom,
+  getMostReviewedRooms,
+  getBestRatedRooms,
 } = require("../controllers/room");
 
 const {
@@ -56,6 +58,10 @@ mongoose
     console.log("not connected");
   });
 
+app.get("/rooms/best-rated", (req, res) => {
+  return getBestRatedRooms(req, res);
+});
+
 app.get("/locations", (req, res) => {
   return getLocations(req, res);
 });
@@ -84,6 +90,10 @@ app.post("/user/login-security", (req, res) => {
   return changeUserPassword(req, res);
 });
 
+app.get("/rooms", (req, res) => {
+  return getRooms(req, res);
+});
+
 app.get("/rooms/:roomId", (req, res) => {
   return getRoom(req, res);
 });
@@ -96,23 +106,19 @@ app.get("/rooms/location/:roomId", (req, res) => {
   return getLocationByRoomId(req, res);
 });
 
-app.get("/location/:locationId/rooms", (req, res) => {
-  return getRooms(req, res);
-});
-
 app.get("/rooms/host/:hostId", (req, res) => {
   return getRoomsByHost(req, res);
 });
 
-app.post("/add-room", (req, res) => {
+app.post("/rooms/add-room", (req, res) => {
   return postRoom(req, res);
 });
 
-app.delete("/location/:locationId/rooms/:roomId", (req, res) => {
+app.delete("/room/:roomId/delete-room", (req, res) => {
   return deleteRoom(req, res);
 });
 
-app.post("/location/:locationId/rooms/:roomId", (req, res) => {
+app.post("/room/:roomId/add-review", (req, res) => {
   return postReview(req, res);
 });
 

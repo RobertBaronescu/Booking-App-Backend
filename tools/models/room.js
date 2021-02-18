@@ -7,7 +7,12 @@ const roomSchema = mongoose.Schema({
   description: { type: String, required: true },
   thumbnail: { type: String, required: true },
   interactionWithGuests: { type: String, required: true },
-  amenities: [{ type: String, required: false }],
+  amenities: [
+    {
+      name: { type: String, required: false },
+      icon: { type: String, required: false },
+    },
+  ],
   price: { type: Number, required: true },
   bookingIds: [
     {
@@ -16,7 +21,6 @@ const roomSchema = mongoose.Schema({
       required: false,
     },
   ],
-  // pictures: [{ type: String, required: false }],
 
   reviews: [
     {
