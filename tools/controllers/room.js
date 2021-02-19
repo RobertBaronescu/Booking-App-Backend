@@ -25,7 +25,6 @@ exports.getBestRatedRooms = async (req, res) => {
 
       rooms[i]._doc = {
         ...rooms[i]._doc,
-        author: foundUser._doc.name,
         hostPicture: foundUser._doc.picture,
       };
     }
