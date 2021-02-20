@@ -18,8 +18,13 @@ exports.getRooms = async (req, res, next) => {
 
 exports.getBestRatedRooms = async (req, res) => {
   try {
-    const rooms = await Room.find({ $query: {}, $orderby: { rating: -1 } });
+    const rooms = await Room.find();
+
+    rooms.sort((a, b) =>
+      a.rating > b.rating ? -1 : b.rating > a.rating ? 1 : 0
+    );
     rooms.splice(4);
+
     for (let i = 0; i < rooms.length; i++) {
       const foundUser = await User.findById(rooms[i]._doc.hostId);
 
